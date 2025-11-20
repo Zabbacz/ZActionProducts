@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="module" client="site" method="upgrade">
+    <name>ZActionProducts</name>
+    <author>Zabba</author>
+    <version>20251118</version>
+    <description>Module displaying promotional products.</description>
+    <license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+    <namespace path="src">Zabba\Module\ZActionProducts</namespace>
+    <files>
+        <folder module="mod_virtuemart_zactionproducts">services</folder>
+        <folder>src</folder>
+        <folder>tmpl</folder>
+        <folder>language</folder>
+        <filename>index.html</filename>
+    </files>
+    <media destination="mod_virtuemart_zactionproducts" folder="media">
+        <filename>joomla.asset.json</filename>
+        <folder>css</folder>
+    </media>
+    <languages>
+      <language tag="en-GB">language/en-GB/mod_virtuemart_zactionproducts.ini</language>
+      <language tag="cs-CZ">language/cs-CZ/mod_virtuemart_zactionproducts.ini</language>
+    </languages>
+
+    <config>
+	<fields name="params" addfieldpath="/administrator/components/com_virtuemart/fields">
+	    <fieldset name="basic">
+		<field
+		    name="virtuemart_category_id"
+		    type="vmcategories"
+		    value_field="category_name"
+		    label="MOD_VIRTUEMART_PRODUCT_CATEGORY_ID"
+		    description="MOD_VIRTUEMART_PRODUCT_CATEGORY_ID_DESC"
+		/>
+                <field
+                    name="obchod"
+                    type="list"
+                    label="Zvolte použití modulu ">
+                    <option value="1">Velkoobchod</option>
+                    <option value="2">Maloobchod</option>
+                </field>
+                <field
+                    name="velkoobchod_id"
+                    type="usergrouplist"
+                    label="Zadejte id velkoobchodní skupiny">
+                </field>
+	    </fieldset>
+	</fields>
+    </config>
+</extension>

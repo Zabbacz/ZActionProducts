@@ -1,0 +1,21 @@
+{
+"$schema": "https://developer.joomla.org/schemas/json-schema/web_assets.json",
+"name": "mod_virtuemart_zactionproducts",
+"version": "1.0.0",
+"description": "Zobrazovani akcnich produktu",
+"license": "GPL-2.0-or-later",
+"assets": [
+{
+"name": "mod_virtuemart_zactionproducts.module",
+"type": "module",
+"version": "1.1.0"
+},
+{
+"name": "mod_virtuemart_zactionproducts.style",
+"type": "style",
+"uri": "mod_virtuemart_zactionproducts/style.css",
+"version": "1.0.0"
+}
+]
+}
+

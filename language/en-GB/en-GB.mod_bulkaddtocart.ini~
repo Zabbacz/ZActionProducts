@@ -1,0 +1,13 @@
+; Virtuemart! Project
+; Copyright (C)  2020 Zabba. All rights reserved.
+; License http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL, see LICENSE.php
+; Note : All ini files need to be saved as UTF-8 - No BOM
+MOD_BULKADDTOCART_ADD_TO_CART="Add to Cart"
+MOD_BULKADDTOCART_CLEAR_FORM="Clear form"
+MOD_BULKADDTOCART_PRODUCT_SKU="Product sku"
+MOD_BULKADDTOCART_QTY="Quantity "
+MOD_BULKADDTOCART_NO_INSERT="No items have been added to the cart yet."
+MOD_BULKADDTOCART_CORRECT_ITEMS="Delete or correct the following items :"
+MOD_BULKADDTOCART_ITEM="Item"
+MOD_BULKADDTOCART_ITEM_INVALID="is invalid, it will not be added to the cart"
+MOD_BULKADDTOCART_INVALID_DATA="Invalid data."

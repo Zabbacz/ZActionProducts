@@ -1,0 +1,71 @@
+.navbar-inner {
+	background-color: #428ddf;
+	background-image: -moz-linear-gradient(center top , #428ddf, #428ddf);
+}
+
+.navbar .brand {
+color: #ffffff;
+}
+
+.navbar .nav .active > a, .navbar .nav .active > a:hover {
+    background-color: #155BA9;
+
+}
+.ui-widget-content
+{
+	background:#FFFFFF;
+}
+
+.sphinx_search a {
+  color: #E56A00 ;
+  }
+
+ul {
+    list-style: none;
+}
+.ui-helper-hidden-accessible {
+        position: absolute;
+        left:-999em; 
+}
+.add-button
+{
+   width: 500px;
+   
+}
+
+.addtocart-bar {
+    line-height: 30px;
+    text-align: left;
+}
+.nazev-produktu{
+  height:80px;
+}
+
+.cena{
+  height:60px;
+}
+
+.product-details-imege-handler {
+    height:120px;
+/*    text-align: center;
+    margin-left: 20px;
+    position: absolute;
+    right: 12em;*/
+}
+        
+
+@media (max-width: 700px) {
+  .product-details-imege-handler {
+    width:auto;
+    text-align: center;
+    margin-left: 0;
+    position: static;
+    
+
+  }
+
+  .addtocart-bar {
+    text-align: center;
+  }
+  
+}
