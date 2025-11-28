@@ -32,6 +32,15 @@
 		    label="MOD_VIRTUEMART_PRODUCT_CATEGORY_ID"
 		    description="MOD_VIRTUEMART_PRODUCT_CATEGORY_ID_DESC"
 		/>
+		<field 
+		    name="action_products" 
+		    type="radio" 
+		    default="0" 
+		    label="Pouze akční produkty" 
+		    description="Budou se zobrazovat pouze akční produkty, na kategorie nebude brán ohled">
+			<option value="1">ANO</option>
+			<option value="0">NE</option>
+		</field>
                 <field
                     name="obchod"
                     type="list"
