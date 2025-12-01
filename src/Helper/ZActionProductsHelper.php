@@ -20,84 +20,110 @@ class ZActionProductsHelper
 	    $query = $db->getQuery(true)
 		->select($db->quoteName('virtuemart_product_id'))
 		->from($db->quoteName('#__virtuemart_product_categories'))
-		->where($db->quoteName('virtuemart_category_id') . ' = :category')
-		->order('RAND()')
-		->bind(':category', $category);
+	        ->where($db->quoteName('virtuemart_category_id') . ' = ' . $db->quote($category))
+		->order('RAND()');
 	}
 	else{
 	    $query = $db->getQuery(true)
 		->select($db->quoteName('virtuemart_product_id'))
 		->from($db->quoteName('#__virtuemart_products'))
-		->where($db->quoteName('product_special') . ' = :actionProducts')
-		->order('RAND()')
-		->bind(':actionProducts', $actionProducts);
+	        ->where($db->quoteName('product_special') . ' = ' . $db->quote($actionProducts))
+		->where($db->quoteName('published') . ' = 1')
+		->order('RAND()');
 	}
         $db->setQuery($query, 0, 4);
         return $db->loadColumn();
     }
+    
+        public function getGroup($param) {
+	$app = Factory::getApplication();
+	$user = $app->getIdentity();
+	$userId = (int) $user->id;
 
+	$db = Factory::getContainer()->get(DatabaseInterface::class);
+	$obchod = $param->get('obchod', '2', 'STRING'); //velkoobchod = 1, maloobchod = 2
+
+	if ($obchod === '1') {
+	    // Determine user's shopper group
+	    $qGroup = $db->getQuery(true)
+		    ->select($db->quoteName('virtuemart_shoppergroup_id'))
+		    ->from($db->quoteName('#__virtuemart_vmuser_shoppergroups'))
+		    ->where($db->quoteName('virtuemart_user_id') . '= :userid')
+		    ->bind(':userid', $userId);
+
+	    $db->setQuery($qGroup);
+	    $groupRow = $db->loadRow();
+	    return $groupRow[0] ?? 5; // Default shopper group if not found
+	} else {
+	    return 0; // Default for maloobchod
+	}
+    }
+    
     /**
      * Return full product data for the selected IDs
      */
     public function getProducts($params)
     {
-        $app    = Factory::getApplication();
-        $user   = $app->getIdentity();
-        $userId = (int) $user->id;
-
         $ids = $this->getProductsIds($params);
         if (!$ids) {
             return [];
         }
 
         $db = Factory::getContainer()->get(DatabaseInterface::class);
-	$obchod = $params->get('obchod', '2', 'STRING'); //velkoobchod = 1, maloobchod = 2
-	if ($obchod ==='1') {
-
-	    // Determine user's shopper group
-	    $qGroup = $db->getQuery(true)
-		->select($db->quoteName('virtuemart_shoppergroup_id'))
-		->from($db->quoteName('#__virtuemart_vmuser_shoppergroups'))
-		->where($db->quoteName('virtuemart_user_id') . '= :userid')
-	        ->bind(':userid', $userId);
-
-	    $db->setQuery($qGroup);
-	    $groupRow = $db->loadRow();
-	    $shopperGroup = $groupRow[0] ?? 5;
-	    }
-	else {
-	    $shopperGroup = 0;
-	    }
+	$shopperGroupId = $this->getGroup($params);
 	$published = 1;
-        // Main query
-        $q = $db->getQuery(true)
-            ->select([
-                't1.virtuemart_product_id',
-                't3.product_in_stock',
-                't1.product_name',
-                't2.virtuemart_category_id',
-                't3.product_availability',
-                't4.product_price',
-                't6.file_url',
-                't3.product_params',
-                't7.calc_value',
-                't9.mf_name',
-                't9.virtuemart_manufacturer_id'
-            ])
-            ->from($db->quoteName('#__virtuemart_products_cs_cz', 't1'))
-            ->join('INNER', '#__virtuemart_product_prices AS t4 ON t1.virtuemart_product_id = t4.virtuemart_product_id')
-            ->join('INNER', '#__virtuemart_products AS t3 ON t1.virtuemart_product_id = t3.virtuemart_product_id')
-            ->join('INNER', '#__virtuemart_product_medias AS t5 ON t1.virtuemart_product_id = t5.virtuemart_product_id')
-            ->join('INNER', '#__virtuemart_medias AS t6 ON t5.virtuemart_media_id = t6.virtuemart_media_id')
-            ->join('INNER', '#__virtuemart_calcs AS t7 ON t4.product_tax_id = t7.virtuemart_calc_id')
-            ->join('INNER', '#__virtuemart_product_manufacturers AS t8 ON t1.virtuemart_product_id = t8.virtuemart_product_id')
-            ->join('INNER', '#__virtuemart_manufacturers_cs_cz AS t9 ON t8.virtuemart_manufacturer_id = t9.virtuemart_manufacturer_id')
-            ->join('LEFT', '#__virtuemart_product_categories AS t2 ON t1.virtuemart_product_id = t2.virtuemart_product_id')
-            ->where('t1.virtuemart_product_id IN (' . implode(',', $ids) . ')')
-            ->where('t4.virtuemart_shoppergroup_id = :shopperGroup')
+	// Main query
+	$q = $db->getQuery(true)
+	    ->select([
+		't1.virtuemart_product_id',
+		't1.product_name',
+		't3.product_in_stock',
+		't3.product_availability',
+		't3.product_params',
+		't2.virtuemart_category_id',
+		't4.product_price',
+
+		'(SELECT m.file_url
+		    FROM #__virtuemart_product_medias pm
+		    JOIN #__virtuemart_medias m 
+			ON m.virtuemart_media_id = pm.virtuemart_media_id
+		    WHERE pm.virtuemart_product_id = t1.virtuemart_product_id
+		    ORDER BY pm.ordering ASC
+		    LIMIT 1
+		) AS file_url',
+
+		'(SELECT calc.calc_value
+		    FROM #__virtuemart_calcs calc
+		    WHERE calc.virtuemart_calc_id = t4.product_tax_id
+		    LIMIT 1
+		) AS calc_value',
+
+		'(SELECT mc.mf_name
+		    FROM #__virtuemart_product_manufacturers pm
+		    JOIN #__virtuemart_manufacturers_cs_cz mc
+			ON mc.virtuemart_manufacturer_id = pm.virtuemart_manufacturer_id
+		    WHERE pm.virtuemart_product_id = t1.virtuemart_product_id
+		    LIMIT 1
+		) AS manufacturer',
+
+		'(SELECT pm.virtuemart_manufacturer_id
+		    FROM #__virtuemart_product_manufacturers pm
+		    WHERE pm.virtuemart_product_id = t1.virtuemart_product_id
+		    LIMIT 1
+		) AS manufacturer_id'
+	    ])
+
+	    ->from('#__virtuemart_products_cs_cz AS t1')
+	    ->join('INNER', '#__virtuemart_products AS t3 ON t1.virtuemart_product_id = t3.virtuemart_product_id')
+	    ->join('INNER', '#__virtuemart_product_prices AS t4 ON t1.virtuemart_product_id = t4.virtuemart_product_id')
+	    ->join('LEFT', '#__virtuemart_product_categories AS t2 ON t1.virtuemart_product_id = t2.virtuemart_product_id')
+
+	    ->where('t1.virtuemart_product_id IN (' . implode(',', $ids) . ')')
+	    ->where('t4.virtuemart_shoppergroup_id = :shopperGroup')
 	    ->where('t3.published = :published')
-	    ->bind(':published', $published)
-	    ->bind(':shopperGroup', $shopperGroup);
+
+	    ->bind(':shopperGroup', $shopperGroupId)
+	    ->bind(':published', $published);
     
         $db->setQuery($q);
         $rows = $db->loadAssocList();
