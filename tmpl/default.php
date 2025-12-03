@@ -37,8 +37,9 @@ $language->load('mod_virtuemart_zactionproducts', JPATH_BASE . '/modules/mod_vir
             $availability = $doc['product_availability'] ?? '';
             $min_qty      = (int)($doc['min_order_level'] ?? 1);
             $step_qty     = (int)($doc['step_order_level'] ?? 1);
+	    $max_qty     = (int)($doc['max_order_level'] ?? null);
 
-            $product_link = Route::_('index.php?option=com_virtuemart&view=productdetails&virtuemart_product_id=' . $product_id . '&virtuemart_category_id=' . $category_id);
+	    $product_link = Route::_('index.php?option=com_virtuemart&view=productdetails&virtuemart_product_id=' . $product_id . '&virtuemart_category_id=' . $category_id);
             $image_src    = Uri::root() . 'images/virtuemart/product/' . ($file_url);
         ?>
 
@@ -87,7 +88,8 @@ $language->load('mod_virtuemart_zactionproducts', JPATH_BASE . '/modules/mod_vir
 				name="quantity[]"
 				value="<?php echo $min_qty; ?>"
 				min="<?php echo $min_qty; ?>"
-				step="<?php echo $step_qty; ?>" />
+				step="<?php echo $step_qty; ?>"
+				max="<?php echo $max_qty; ?>" />
 
 			    <input type="submit"
 				name="addtocart"

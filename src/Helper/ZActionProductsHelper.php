@@ -150,6 +150,7 @@ class ZActionProductsHelper
                 'manufacturer_id'        => $row['virtuemart_manufacturer_id'],
                 'min_order_level'        => $paramsPack['min_order_level'],
                 'step_order_level'       => $paramsPack['step_order_level'],
+		'max_order_level'        => $paramsPack['max_order_level'],
                 'product_in_stock'       => $row['product_in_stock']
             ];
         }
@@ -168,30 +169,37 @@ class ZActionProductsHelper
     /**
      * Parse VM product_params
      */
-public static function getBaleni($input)
-{
-    $defaults = [
-        'min_order_level'  => 1,
-        'step_order_level' => 1
-    ];
+    public static function getBaleni($input)
+    {
+	$defaults = [
+	    'min_order_level'  => 1,
+	    'step_order_level' => 1,
+	    'max_order_level' => null
+	];
 
-    if (!$input) {
-        return $defaults;
+	if (!$input) {
+	    return $defaults;
+        }
+
+	$out = [];
+
+	// min_order_level
+	if (preg_match('/min_order_level="([^"]*)"/', $input, $m)) {
+	    $out['min_order_level'] = ($m[1] !== '') ? (int)$m[1] : 1;
+	}
+
+	// step_order_level
+	if (preg_match('/step_order_level="([^"]*)"/', $input, $m)) {
+            $out['step_order_level'] = ($m[1] !== '') ? (int)$m[1] : 1;
+	}
+    
+	// max_order_level
+	if (preg_match('/max_order_level="([^"]*)"/', $input, $m)) {
+	    $out['max_order_level'] = ($m[1] !== '') ? (int)$m[1] : null;
+	}
+    
+
+	return array_merge($defaults, $out);
     }
-
-    $out = [];
-
-    // min_order_level
-    if (preg_match('/min_order_level="([^"]*)"/', $input, $m)) {
-        $out['min_order_level'] = ($m[1] !== '') ? (int)$m[1] : 1;
-    }
-
-    // step_order_level
-    if (preg_match('/step_order_level="([^"]*)"/', $input, $m)) {
-        $out['step_order_level'] = ($m[1] !== '') ? (int)$m[1] : 1;
-    }
-
-    return array_merge($defaults, $out);
-}
 
 }
